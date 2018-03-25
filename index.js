@@ -1,12 +1,15 @@
 const express = require('express');
 const app = express();
 const axios = require('axios');
-const HACKER_URL = 'https://hacker-news.firebaseio.com/v0/';
-const MAX_COUNT = 600;
-const WEEK_TIMESTAMP = 7*24*60*60*1000;
-const MAX_FREQUENT_WORDS = 10;
-const MIN_KARMA = 10000;
-const COUNT_TITLES_LAST = 60;
+
+const {
+    HACKER_URL,
+    MAX_COUNT = 600,
+    WEEK_TIMESTAMP,
+    MAX_FREQUENT_WORDS,
+    MIN_KARMA,
+    COUNT_TITLES
+} = require('./constants');
 
 const getStoryTitle = async (id) => {
     return axios.get(`${HACKER_URL}item/${id}.json`)
@@ -114,11 +117,9 @@ app.get('/newstories', async (req, response) => {
         let titles = [];
         const res = await axios.get(HACKER_URL+'newstories.json?print=pretty');
         const ids = res.data;
-        console.log('----');
         titles = await Promise.all(ids.map((id) => getStoryTitle(id)));
 
         let lastId = res.data[res.data.length - 1] - 1;
-        console.log('----');
         while ((titles.length < MAX_COUNT) && (lastId > 0)) {
             try {
                 const title = await getStoryTitle(lastId);
@@ -198,7 +199,7 @@ app.get('/getuserfeed', async (req, response) => {
         const items = await Promise.all(ids.map((id) => getItem(id)));
         let itemId = res.data[res.data.length - 1] - 1;
 
-        while ( titles.length < COUNT_TITLES_LAST && itemId > 0) {
+        while ( titles.length < COUNT_TITLES && itemId > 0) {
             try {
                 let curItem;
                 if (items.length > 0) {
