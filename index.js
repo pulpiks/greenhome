@@ -17,7 +17,7 @@ const getStoryTitle = async (id) => {
                 return data.title;
             }
             else {
-                throw new Error('not a story');
+                return '';
             }
         })
         .catch((e) => {
@@ -121,10 +121,10 @@ app.get('/newstories', async (req, response) => {
         console.log('----');
         while ((titles.length < MAX_COUNT) && (lastId > 0)) {
             try {
-                console.log(titles.length);
                 const title = await getStoryTitle(lastId);
-                console.log(title);
-                titles.push(title);
+                if (title && title.trim()) {
+                    titles.push(title);
+                }
             } catch (err) {
                 //
             }
