@@ -79,9 +79,13 @@ const findFrequentWords = (titles) => {
     var wordCounts = {};
     titles.forEach((title) => {
         console.log('title', title);
-        let words = title.split(' ');
-        for(var i = 0; i < words.length; i++)
-            wordCounts[words[i]] = (wordCounts[words[i]] || 0) + 1;
+        let words = title.toLowerCase().split(/[^a-zA-Z_\-']+/);
+        for(var i = 0; i < words.length; i++){
+            if (words[i]!=='') {
+                wordCounts[words[i]] = (wordCounts[words[i]] || 0) + 1;
+            }
+        }
+
     });
     console.log('wordsCount = ', wordCounts);
     const mostFrequentWords = Object.keys(wordCounts).sort((word1, word2) => {
