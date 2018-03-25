@@ -4,7 +4,7 @@ const axios = require('axios');
 
 const {
     HACKER_URL,
-    MAX_COUNT = 600,
+    MAX_COUNT,
     WEEK_TIMESTAMP,
     MAX_FREQUENT_WORDS,
     MIN_KARMA,
@@ -90,21 +90,24 @@ const findFrequentWords = (titles) => {
 
     });
     console.log('wordsCount = ', wordCounts);
-    const mostFrequentWords = Object.keys(wordCounts).sort((word1, word2) => {
-        return wordCounts[word2] - wordCounts[word1];
-    });
-    console.log('mostFrequentWords', mostFrequentWords);
-    const maxCount = (mostFrequentWords.length > 0) ? wordCounts[mostFrequentWords[0]] : null;
-    console.log('maxCount = ', maxCount);
-    let resMas = [];
-    if (maxCount) {
 
-        resMas = mostFrequentWords.reduce((words, word, index) => {
-            if (words.length < MAX_FREQUENT_WORDS) {
-                words.push(word);
+    const wordsArr = Object.keys(wordCounts);
+    const limit = wordsArr.length - MAX_FREQUENT_WORDS >=0 ? MAX_FREQUENT_WORDS : wordsArr.length;
+    let resMas = [];
+    let indexes = [];
+    for(let i =0; i < limit; i++) {
+        let key = null;
+        let max = 0;
+        let index;
+        wordsArr.forEach((word, j) => {
+            if (wordCounts[word] >= max && indexes.indexOf(j) < 0 ) {
+                max = wordCounts[word];
+                key = word;
+                index = j;
             }
-            return words;
-        }, []);
+        });
+        resMas.push(key);
+        indexes.push(index);
     }
 
     return resMas;
@@ -135,7 +138,6 @@ app.get('/newstories', async (req, response) => {
         // most frequent words
         const resMas = findFrequentWords(titles);
 
-        console.log(resMas);
         response.send(resMas);
     }
     catch (err) {
