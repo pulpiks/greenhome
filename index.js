@@ -1,16 +1,15 @@
 const express = require('express');
 const app = express();
 const axios = require('axios');
-const haskerUrl = 'https://hacker-news.firebaseio.com/v0/';
-const MAX_COUNT = 505;
+const HACKER_URL = 'https://hacker-news.firebaseio.com/v0/';
+const MAX_COUNT = 600;
 const WEEK_TIMESTAMP = 7*24*60*60*1000;
-const MINS_1_TIMESTAMP = 2*60*1000;
 const MAX_FREQUENT_WORDS = 10;
-const MIN_KARMA = 1;
-const COUNT_TITLES_LAST = 50;
+const MIN_KARMA = 10000;
+const COUNT_TITLES_LAST = 60;
 
 const getStoryTitle = async (id) => {
-    return axios.get(`${haskerUrl}item/${id}.json`)
+    return axios.get(`${HACKER_URL}item/${id}.json`)
         .then(res => {
             const data = res.data;
             if (data.type === 'story') {
@@ -26,7 +25,7 @@ const getStoryTitle = async (id) => {
 };
 
 const getMaxItemId = async () => {
-    return axios.get(`${haskerUrl}maxitem.json?print=pretty`)
+    return axios.get(`${HACKER_URL}maxitem.json?print=pretty`)
         .then(res => {
             if (typeof(+res.data)==='number') {
                 return res.data;
@@ -41,7 +40,7 @@ const getMaxItemId = async () => {
 };
 
 const getItem = async (id) => {
-    return axios.get(`${haskerUrl}item/${id}.json`)
+    return axios.get(`${HACKER_URL}item/${id}.json`)
         .then(res => {
             return res.data;
         })
@@ -51,7 +50,7 @@ const getItem = async (id) => {
 };
 
 const getStory = async (id) => {
-    return axios.get(`${haskerUrl}item/${id}.json`)
+    return axios.get(`${HACKER_URL}item/${id}.json`)
         .then(res => {
             const data = res.data;
             if (data.type === 'story') {
@@ -67,7 +66,7 @@ const getStory = async (id) => {
 };
 
 const getUser = async (userId) => {
-    return axios.get(`${haskerUrl}user/${userId}.json`)
+    return axios.get(`${HACKER_URL}user/${userId}.json`)
         .then(res => res.data)
         .catch((e) => {
             throw new Error(e);
@@ -96,6 +95,7 @@ const findFrequentWords = (titles) => {
     console.log('maxCount = ', maxCount);
     let resMas = [];
     if (maxCount) {
+
         resMas = mostFrequentWords.reduce((words, word, index) => {
             if (words.length < MAX_FREQUENT_WORDS) {
                 words.push(word);
@@ -112,7 +112,7 @@ const findFrequentWords = (titles) => {
 app.get('/newstories', async (req, response) => {
     try {
         let titles = [];
-        const res = await axios.get(haskerUrl+'newstories.json?print=pretty');
+        const res = await axios.get(HACKER_URL+'newstories.json?print=pretty');
         const ids = res.data;
         console.log('----');
         titles = await Promise.all(ids.map((id) => getStoryTitle(id)));
@@ -150,7 +150,7 @@ app.get('/newstories', async (req, response) => {
 app.get('/getfeedforlastweek', async (req, res) => {
     console.log('req', req.query.time);
     let curTime = Date.now();
-    let timeWeekAgo = curTime - MINS_1_TIMESTAMP;
+    let timeWeekAgo = curTime - WEEK_TIMESTAMP;
     let itemTime = curTime;
     try {
         let itemId = await getMaxItemId();
@@ -192,7 +192,7 @@ app.get('/getfeedforlastweek', async (req, res) => {
 app.get('/getuserfeed', async (req, response) => {
     try {
         let titles = [];
-        const res = await axios.get(haskerUrl+'newstories.json?print=pretty');
+        const res = await axios.get(HACKER_URL+'newstories.json?print=pretty');
         const ids = res.data;
         console.log('----');
         const items = await Promise.all(ids.map((id) => getItem(id)));

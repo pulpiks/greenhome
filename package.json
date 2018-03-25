@@ -1,0 +1,24 @@
+{
+  "name": "greenhome",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/pulpiks/greenhome.git"
+  },
+  "author": "kseniia lvova",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/pulpiks/greenhome/issues"
+  },
+  "homepage": "https://github.com/pulpiks/greenhome#readme",
+  "dependencies": {
+    "axios": "^0.18.0",
+    "express": "^4.16.3"
+  }
+}
